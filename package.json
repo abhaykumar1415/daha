@@ -1,5 +1,5 @@
 {
-  "name": "daha",
+  "name": "daha-cli",
   "version": "1.0.0",
   "description": "Performance as Code for Next.js - Core Web Vitals and Lighthouse Audits CLI",
   "type": "module",

@@ -1,6 +1,6 @@
 # Daha
 
-[![npm version](https://img.shields.io/npm/v/daha.svg?style=flat-square)](https://www.npmjs.com/package/daha)
+[![npm version](https://img.shields.io/npm/v/daha-cli.svg?style=flat-square)](https://www.npmjs.com/package/daha-cli)
 [![node version](https://img.shields.io/badge/node-%3E%3D20.0.0-blue?style=flat-square)](https://nodejs.org)
 [![license](https://img.shields.io/npm/l/daha.svg?style=flat-square)](https://github.com/abhaykumar/daha/blob/main/LICENSE)
 
@@ -29,13 +29,13 @@ It discovers routes automatically, runs isolated Lighthouse audits via Playwrigh
 Install globally for quick CLI use:
 
 ```bash
-npm install -g daha
+npm install -g daha-cli
 ```
 
 Or add as a project dependency:
 
 ```bash
-npm install --save-dev daha
+npm install --save-dev daha-cli
 ```
 
 ---
@@ -115,7 +115,7 @@ Validates threshold rules against a pre-existing `summary.json` run output.
 ## Configuration API (`daha.config.ts`)
 
 ```typescript
-import { DahaConfig } from 'daha';
+import { DahaConfig } from 'daha-cli';
 
 const config: DahaConfig = {
   // Routes to audit. 'auto' discovers pages. Or pass a string array: ['/', '/about']
