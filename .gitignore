@@ -1,0 +1,7 @@
+node_modules
+dist
+.vitix
+.next
+temp-workspace-test
+*.log
+.DS_Store
