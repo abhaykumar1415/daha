@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import { globby } from 'globby';
 import { chromium } from 'playwright';
 import { DiscoveryError } from '../utils/errors.js';
-import { ParsedVitixConfig } from '../types/config.js';
+import { ParsedDahaConfig } from '../types/config.js';
 
 export interface RouteDiscoveryResult {
   routes: string[];
@@ -516,7 +516,7 @@ async function crawlWithPlaywright(baseUrl: string, maxDepth = 3): Promise<strin
  */
 export async function discoverRoutes(
   projectDir: string,
-  config: ParsedVitixConfig,
+  config: ParsedDahaConfig,
   options?: {
     crawlerBaseUrl?: string;
     useCrawlerOnly?: boolean;

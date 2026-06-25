@@ -1,12 +1,12 @@
-# Vitix
+# Daha
 
-[![npm version](https://img.shields.io/npm/v/vitix.svg?style=flat-square)](https://www.npmjs.com/package/vitix)
+[![npm version](https://img.shields.io/npm/v/daha.svg?style=flat-square)](https://www.npmjs.com/package/daha)
 [![node version](https://img.shields.io/badge/node-%3E%3D20.0.0-blue?style=flat-square)](https://nodejs.org)
-[![license](https://img.shields.io/npm/l/vitix.svg?style=flat-square)](https://github.com/abhaykumar/vitix/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/daha.svg?style=flat-square)](https://github.com/abhaykumar/daha/blob/main/LICENSE)
 
 > **Performance as Code for Modern Web Applications (Next.js, Remix, Astro, SvelteKit)**
 
-**Vitix** is an enterprise-ready performance engineering CLI tool that automates Lighthouse audits, tracks Core Web Vitals, and monitors regressions across web applications and monorepos. 
+**Daha** is an enterprise-ready performance engineering CLI tool that automates Lighthouse audits, tracks Core Web Vitals, and monitors regressions across web applications and monorepos. 
 
 It discovers routes automatically, runs isolated Lighthouse audits via Playwright, compares results against historical baselines, fetches real-user metrics (RUM) via the Chrome UX Report (CrUX) API, and notifies developers through Slack/Discord webhook alerts.
 
@@ -29,13 +29,13 @@ It discovers routes automatically, runs isolated Lighthouse audits via Playwrigh
 Install globally for quick CLI use:
 
 ```bash
-npm install -g vitix
+npm install -g daha
 ```
 
 Or add as a project dependency:
 
 ```bash
-npm install --save-dev vitix
+npm install --save-dev daha
 ```
 
 ---
@@ -43,39 +43,39 @@ npm install --save-dev vitix
 ## Quick Start
 
 ### 1. Initialize Config
-Generate a default `vitix.config.ts` configuration file:
+Generate a default `daha.config.ts` configuration file:
 
 ```bash
-vitix init
+daha init
 ```
 
 ### 2. Verify Routes
 Test your route scanner configuration to see what paths will be audited:
 
 ```bash
-vitix routes
+daha routes
 ```
 
 ### 3. Execute Audits
 Build your production assets, start a local server, and run Lighthouse checks:
 
 ```bash
-vitix audit
+daha audit
 ```
 
 ---
 
 ## CLI Command Reference
 
-### `vitix init`
-Initializes a fully annotated `vitix.config.ts` file in the current directory.
+### `daha init`
+Initializes a fully annotated `daha.config.ts` file in the current directory.
 
-### `vitix routes`
+### `daha routes`
 Scans and displays all detected page routes.
 - `-c, --config <file>`: Custom configuration path.
 - `--json`: Output as a raw JSON array.
 
-### `vitix audit`
+### `daha audit`
 Compiles, runs local servers, and executes Lighthouse audits.
 - `-c, --config <file>`: Custom configuration path.
 - `-r, --route <path>`: Focus audit on a single route (e.g. `/blog`).
@@ -88,36 +88,36 @@ Compiles, runs local servers, and executes Lighthouse audits.
 - `-o, --open`: Opens the HTML dashboard in a browser after completing the audit.
 - `--verbose`: Prints verbose logs.
 
-### `vitix workspace`
+### `daha workspace`
 Finds child projects in monorepos, audits them in parallel, and compiles a centralized index.
 - `--concurrency <number>`: Number of packages to audit in parallel (default: `2`).
 - `--runs <number>`: Override runs per route.
 - `--ci` / `--verbose`: Propagate run styles.
 
-### `vitix serve`
+### `daha serve`
 Spins up a local server to explore historical reports and performance graphs.
 - `-p, --port <number>`: Override port (default: `4000`).
 - `--host <string>`: Server host binding.
 - `--ci`: Run without auto-opening the browser.
 
-### `vitix doctor`
+### `daha doctor`
 Runs static analysis on files catching layout shift, missing font preconnect tags, or unoptimized image sources.
 
-### `vitix watch`
+### `daha watch`
 Monitors local file changes and triggers instant dev audits for targeted routes.
 
-### `vitix check`
+### `daha check`
 Validates threshold rules against a pre-existing `summary.json` run output.
 - `-s, --summary <file>`: Path to the target summary output.
 
 ---
 
-## Configuration API (`vitix.config.ts`)
+## Configuration API (`daha.config.ts`)
 
 ```typescript
-import { VitixConfig } from 'vitix';
+import { DahaConfig } from 'daha';
 
-const config: VitixConfig = {
+const config: DahaConfig = {
   // Routes to audit. 'auto' discovers pages. Or pass a string array: ['/', '/about']
   routes: 'auto',
 
@@ -172,12 +172,12 @@ const config: VitixConfig = {
 
   // Outputs & History
   output: {
-    dir: '.vitix',
+    dir: '.daha',
     formats: ['html', 'json', 'csv', 'junit']
   },
   baseline: {
     enabled: true,
-    dir: '.vitix/baseline'
+    dir: '.daha/baseline'
   },
 
   // CI limits & metric regression checks
@@ -241,8 +241,8 @@ jobs:
       - name: Install Playwright (Chrome)
         run: npx playwright install chromium
 
-      - name: Run Vitix Audits
-        run: npx vitix audit --ci --baseline
+      - name: Run Daha Audits
+        run: npx daha audit --ci --baseline
         env:
           GOOGLE_CRUX_API_KEY: ${{ secrets.GOOGLE_CRUX_API_KEY }}
 
@@ -250,7 +250,7 @@ jobs:
         if: github.event_name == 'pull_request' && always()
         uses: mshick/add-pr-comment@v2
         with:
-          message-path: .vitix/latest/pr_comment.md
+          message-path: .daha/latest/pr_comment.md
 ```
 
 ---
@@ -261,10 +261,10 @@ To isolate audits from local CPU throttle differences and run them on a consiste
 
 ```bash
 # Build local docker image
-docker build -t vitix .
+docker build -t daha .
 
 # Execute audit inside container
-vitix audit --docker
+daha audit --docker
 ```
 
 ---
@@ -277,8 +277,8 @@ We welcome community contributions! Please read our guidelines to get started.
 
 1. **Clone repository**:
    ```bash
-   git clone git@github.com:abhaykumar1415/Vitix.git
-   cd Vitix
+   git clone git@github.com:abhaykumar1415/daha.git
+   cd daha
    npm install
    ```
 

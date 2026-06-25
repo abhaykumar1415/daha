@@ -14,7 +14,7 @@ const MIME_TYPES: Record<string, string> = {
   '.json': 'application/json; charset=utf-8',
 };
 
-const SERVE_DASHBOARD_HTML = `<html>Vitix Historical Runs</html>`;
+const SERVE_DASHBOARD_HTML = `<html>Daha Historical Runs</html>`;
 
 // Test-specific server creator utilizing the exact same routing logic as src/cli/serve.ts
 function createTestServer(baseOutputDir: string, historyPath: string) {
@@ -107,7 +107,7 @@ describe('Serve Dashboard Server', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toContain('text/html');
     const text = await res.text();
-    expect(text).toContain('Vitix Historical Runs');
+    expect(text).toContain('Daha Historical Runs');
   });
 
   it('should serve history JSON on /api/history', async () => {

@@ -8,7 +8,7 @@ import { globby } from 'globby';
 import yaml from 'js-yaml';
 import { table } from 'table';
 import { loadConfig } from '../config/loader.js';
-import { VitixRunSummary } from '../types/config.js';
+import { DahaRunSummary } from '../types/config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +18,7 @@ export interface PackageResult {
   name: string;
   dir: string;
   passed: boolean;
-  summary: VitixRunSummary | null;
+  summary: DahaRunSummary | null;
   error?: string;
 }
 
@@ -26,16 +26,16 @@ export async function handleWorkspaceCommand(options: any): Promise<void> {
   const rootDir = process.cwd();
   const startTime = Date.now();
 
-  console.log(chalk.bold.cyan('\n=== Vitix Workspace Scanner ==='));
+  console.log(chalk.bold.cyan('\n=== Daha Workspace Scanner ==='));
   
   const scanSpinner = ora('Scanning directory for monorepo packages...').start();
   const packages = await findWorkspacePackages(rootDir);
   
   if (packages.length === 0) {
-    scanSpinner.fail(chalk.red('No child packages with Vitix configuration found in workspace.'));
+    scanSpinner.fail(chalk.red('No child packages with Daha configuration found in workspace.'));
     process.exit(1);
   }
-  scanSpinner.succeed(`Discovered ${packages.length} child package(s) with Vitix configuration.`);
+  scanSpinner.succeed(`Discovered ${packages.length} child package(s) with Daha configuration.`);
 
   // Prepare arguments for forwarding
   const forwardArgs: string[] = ['audit', '--ci'];
@@ -84,12 +84,12 @@ export async function handleWorkspaceCommand(options: any): Promise<void> {
         const passed = execResult.exitCode === 0;
 
         // Load config to find the correct output path
-        let outputDir = '.vitix';
+        let outputDir = '.daha';
         const originalCwd = process.cwd();
         try {
           process.chdir(packageDir);
           const packageConfig = await loadConfig();
-          outputDir = packageConfig.output?.dir || '.vitix';
+          outputDir = packageConfig.output?.dir || '.daha';
         } catch (err) {
           // Fallback
         } finally {
@@ -97,7 +97,7 @@ export async function handleWorkspaceCommand(options: any): Promise<void> {
         }
 
         const summaryPath = path.join(packageDir, outputDir, 'latest', 'summary.json');
-        let summary: VitixRunSummary | null = null;
+        let summary: DahaRunSummary | null = null;
         if (await fs.pathExists(summaryPath)) {
           summary = await fs.readJson(summaryPath);
         }
@@ -143,7 +143,7 @@ export async function handleWorkspaceCommand(options: any): Promise<void> {
   await Promise.all(workers);
 
   // Print Terminal Report
-  console.log('\n' + chalk.bold.cyan('=== Vitix Workspace Audit Summary ===') + '\n');
+  console.log('\n' + chalk.bold.cyan('=== Daha Workspace Audit Summary ===') + '\n');
   const headers = [
     chalk.bold('Package'),
     chalk.bold('Status'),
@@ -196,7 +196,7 @@ export async function handleWorkspaceCommand(options: any): Promise<void> {
   console.log(table(rows));
 
   // Generate Workspace html report
-  const workspaceOutDir = path.join(rootDir, '.vitix', 'workspace');
+  const workspaceOutDir = path.join(rootDir, '.daha', 'workspace');
   await fs.ensureDir(workspaceOutDir);
 
   const htmlPath = path.join(workspaceOutDir, 'index.html');
@@ -264,15 +264,15 @@ export async function findWorkspacePackages(rootDir: string): Promise<string[]> 
   // 3. Fallback/scan for subfolders containing config files
   if (packages.length === 0) {
     const configGlob = await globby([
-      '**/vitix.config.ts',
-      '**/vitix.config.js',
-      '**/vitix.config.mjs',
-      '**/.vitixrc.json',
-      '**/.vitixrc.yaml',
-      '**/.vitixrc.yml',
+      '**/daha.config.ts',
+      '**/daha.config.js',
+      '**/daha.config.mjs',
+      '**/.daharc.json',
+      '**/.daharc.yaml',
+      '**/.daharc.yml',
     ], {
       cwd: rootDir,
-      ignore: ['**/node_modules/**', '**/.next/**', '**/dist/**', '.vitix/**'],
+      ignore: ['**/node_modules/**', '**/.next/**', '**/dist/**', '.daha/**'],
       absolute: true,
     });
 
@@ -284,16 +284,16 @@ export async function findWorkspacePackages(rootDir: string): Promise<string[]> 
   const uniqueDirs = Array.from(new Set(packages))
     .filter(dir => dir !== rootDir && fs.statSync(dir).isDirectory());
 
-  // Filter to directories that actually contain a vitix configuration file
+  // Filter to directories that actually contain a daha configuration file
   const finalDirs: string[] = [];
   for (const dir of uniqueDirs) {
     const hasConfig = (
-      await fs.pathExists(path.join(dir, 'vitix.config.ts')) ||
-      await fs.pathExists(path.join(dir, 'vitix.config.js')) ||
-      await fs.pathExists(path.join(dir, 'vitix.config.mjs')) ||
-      await fs.pathExists(path.join(dir, '.vitixrc.json')) ||
-      await fs.pathExists(path.join(dir, '.vitixrc.yaml')) ||
-      await fs.pathExists(path.join(dir, '.vitixrc.yml'))
+      await fs.pathExists(path.join(dir, 'daha.config.ts')) ||
+      await fs.pathExists(path.join(dir, 'daha.config.js')) ||
+      await fs.pathExists(path.join(dir, 'daha.config.mjs')) ||
+      await fs.pathExists(path.join(dir, '.daharc.json')) ||
+      await fs.pathExists(path.join(dir, '.daharc.yaml')) ||
+      await fs.pathExists(path.join(dir, '.daharc.yml'))
     );
     if (hasConfig) {
       finalDirs.push(dir);
@@ -341,10 +341,10 @@ export function generateWorkspaceHtml(results: PackageResult[], rootDir: string,
       }
 
       // Calculate relative path to this package's index report html
-      // Workspace index is at <rootDir>/.vitix/workspace/index.html
-      // Child report is at <res.dir>/.vitix/latest/index.html (or whatever output dir)
-      // Let's assume standard output dir is .vitix for relative links
-      const relativeReportPath = `../../${relativeDir.replace(/\\/g, '/')}/.vitix/latest/index.html`;
+      // Workspace index is at <rootDir>/.daha/workspace/index.html
+      // Child report is at <res.dir>/.daha/latest/index.html (or whatever output dir)
+      // Let's assume standard output dir is .daha for relative links
+      const relativeReportPath = `../../${relativeDir.replace(/\\/g, '/')}/.daha/latest/index.html`;
 
       const routesRows = res.summary.routes.map(r => {
         const perf = r.medianRun.scores.performance;
@@ -430,7 +430,7 @@ export function generateWorkspaceHtml(results: PackageResult[], rootDir: string,
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vitix - Workspace Audits Dashboard</title>
+  <title>Daha - Workspace Audits Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -649,7 +649,7 @@ export function generateWorkspaceHtml(results: PackageResult[], rootDir: string,
 <body>
   <header>
     <div class="header-container">
-      <div class="logo">Vitix Workspace Dashboard</div>
+      <div class="logo">Daha Workspace Dashboard</div>
       <div class="meta-tag">Generated: ${timestamp}</div>
     </div>
   </header>

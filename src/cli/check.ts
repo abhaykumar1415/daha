@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { loadConfig } from '../config/loader.js';
 import { analyzeRouteRuns } from '../analyzer/index.js';
 import { printTerminalReport } from '../reporter/index.js';
-import { VitixRunSummary, RouteAuditSummary } from '../types/config.js';
+import { DahaRunSummary, RouteAuditSummary } from '../types/config.js';
 
 export interface CheckCommandOptions {
   config?: string;
@@ -19,17 +19,17 @@ export async function handleCheckCommand(options: CheckCommandOptions): Promise<
     const config = await loadConfig(options.config);
     
     // Find summary JSON path
-    const defaultSummaryPath = path.join(process.cwd(), config.output?.dir || '.vitix', 'summary.json');
+    const defaultSummaryPath = path.join(process.cwd(), config.output?.dir || '.daha', 'summary.json');
     const summaryPath = options.summary ? path.resolve(options.summary) : defaultSummaryPath;
 
     if (!await fs.pathExists(summaryPath)) {
       console.error(chalk.red(`\nError: Pre-existing summary file not found at ${summaryPath}`));
-      console.log(chalk.gray('Please run `vitix audit` first to generate a summary report.\n'));
+      console.log(chalk.gray('Please run `daha audit` first to generate a summary report.\n'));
       process.exit(1);
     }
 
     console.log(chalk.dim(`Reading audit summary from: ${summaryPath}`));
-    const rawSummary: VitixRunSummary = await fs.readJson(summaryPath);
+    const rawSummary: DahaRunSummary = await fs.readJson(summaryPath);
     
     // Re-analyze all routes in the summary file using current config thresholds
     const reAnalyzedRoutes: RouteAuditSummary[] = [];
@@ -49,7 +49,7 @@ export async function handleCheckCommand(options: CheckCommandOptions): Promise<
       reAnalyzedRoutes.push(updatedRouteSummary);
     }
 
-    const updatedSummary: VitixRunSummary = {
+    const updatedSummary: DahaRunSummary = {
       timestamp: rawSummary.timestamp,
       durationMs: rawSummary.durationMs,
       routes: reAnalyzedRoutes,

@@ -41,14 +41,14 @@ const getVersion = (): string => {
 const program = new Command();
 
 program
-  .name('vitix')
+  .name('daha')
   .description('Performance as Code for Next.js - Core Web Vitals and Lighthouse Audits CLI')
   .version(getVersion());
 
 // 1. init command
 program
   .command('init')
-  .description('Initialize a default vitix.config.ts file in the current directory')
+  .description('Initialize a default daha.config.ts file in the current directory')
   .action(async () => {
     await handleInitCommand();
   });
@@ -115,7 +115,7 @@ program
 // 3e. workspace command
 program
   .command('workspace')
-  .description('Run Vitix audits concurrently across all monorepo workspace packages')
+  .description('Run Daha audits concurrently across all monorepo workspace packages')
   .option('--concurrency <number>', 'Override number of packages audited in parallel (default: 2)')
   .option('--runs <number>', 'Override number of runs per route')
   .option('--ci', 'Continuous Integration mode (minimal output, no dynamic progress spinners)')
@@ -164,7 +164,7 @@ program
           '-v', `${currentDir}:/project`,
           '-w', '/project',
           '--net=host',
-          'vitix',
+          'daha',
           ...argsToForward
         ];
         const { spawnSync } = await import('node:child_process');

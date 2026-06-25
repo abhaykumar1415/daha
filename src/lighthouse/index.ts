@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 import lighthouse from 'lighthouse';
 import { findFreePort } from '../utils/server.js';
 import { LighthouseError } from '../utils/errors.js';
-import { ParsedVitixConfig, AuditResult, LighthouseCategory, CoreWebVitalKey } from '../types/config.js';
+import { ParsedDahaConfig, AuditResult, LighthouseCategory, CoreWebVitalKey } from '../types/config.js';
 import chalk from 'chalk';
 
 // Safely handle ESM default export wrapper for Lighthouse
@@ -22,7 +22,7 @@ export interface LighthouseRunOptions {
  * Runs a single Lighthouse audit on a URL.
  */
 export async function runSingleAudit(
-  config: ParsedVitixConfig,
+  config: ParsedDahaConfig,
   options: LighthouseRunOptions,
   verbose = false
 ): Promise<AuditResult> {

@@ -4,7 +4,7 @@ import {
   calculateAverages, 
   analyzeRouteRuns 
 } from '../src/analyzer/index.js';
-import { AuditResult, VitixConfig } from '../src/types/config.js';
+import { AuditResult, DahaConfig } from '../src/types/config.js';
 
 const mockRuns: AuditResult[] = [
   {
@@ -70,7 +70,7 @@ describe('Threshold Analyzer', () => {
   });
 
   describe('analyzeRouteRuns', () => {
-    const config: VitixConfig = {
+    const config: DahaConfig = {
       routes: 'auto',
       thresholds: {
         categories: {
@@ -91,7 +91,7 @@ describe('Threshold Analyzer', () => {
       },
       build: { command: 'npm run build', dir: '.next' },
       server: { command: 'npm run start' },
-      output: { dir: '.vitix', formats: ['html'] }
+      output: { dir: '.daha', formats: ['html'] }
     };
 
     it('should pass if median run meets all thresholds', () => {

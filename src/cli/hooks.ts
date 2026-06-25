@@ -17,20 +17,20 @@ export async function handleInitHooksCommand(): Promise<void> {
   const huskyDir = path.join(projectDir, '.husky');
   if (await fs.pathExists(huskyDir)) {
     const huskyPreCommitPath = path.join(huskyDir, 'pre-commit');
-    const huskyHookContent = 'npx vitix check\n';
+    const huskyHookContent = 'npx daha check\n';
 
     try {
       if (await fs.pathExists(huskyPreCommitPath)) {
         const existing = await fs.readFile(huskyPreCommitPath, 'utf8');
-        if (!existing.includes('vitix check')) {
+        if (!existing.includes('daha check')) {
           await fs.appendFile(huskyPreCommitPath, `\n${huskyHookContent}`);
-          console.log(chalk.green('\n✓ Appended Vitix check to existing Husky pre-commit hook.'));
+          console.log(chalk.green('\n✓ Appended Daha check to existing Husky pre-commit hook.'));
         } else {
-          console.log(chalk.yellow('\n⚠️  Vitix check is already present in your Husky pre-commit hook.'));
+          console.log(chalk.yellow('\n⚠️  Daha check is already present in your Husky pre-commit hook.'));
         }
       } else {
         await fs.writeFile(huskyPreCommitPath, `#!/bin/sh\n. "$(dirname "$0")/_/husky.sh"\n\n${huskyHookContent}`, { mode: 0o755 });
-        console.log(chalk.green('\n✓ Created new Husky pre-commit hook for Vitix check.'));
+        console.log(chalk.green('\n✓ Created new Husky pre-commit hook for Daha check.'));
       }
       console.log(chalk.white(`Configured: ${chalk.bold(huskyPreCommitPath)}\n`));
       return;
@@ -46,30 +46,30 @@ export async function handleInitHooksCommand(): Promise<void> {
   const nativePreCommitPath = path.join(gitHooksDir, 'pre-commit');
 
   const nativeHookContent = `#!/bin/sh
-# Vitix Pre-commit Performance Threshold Check
-echo "Checking Vitix performance budgets..."
-npx vitix check
+# Daha Pre-commit Performance Threshold Check
+echo "Checking Daha performance budgets..."
+npx daha check
 if [ $? -ne 0 ]; then
-  echo "❌ Vitix performance check failed. Commit aborted."
+  echo "❌ Daha performance check failed. Commit aborted."
   exit 1
 fi
-echo "✓ Vitix performance checks passed."
+echo "✓ Daha performance checks passed."
 `;
 
   try {
     if (await fs.pathExists(nativePreCommitPath)) {
       const existing = await fs.readFile(nativePreCommitPath, 'utf8');
-      if (!existing.includes('vitix check')) {
+      if (!existing.includes('daha check')) {
         // Backup existing
         await fs.writeFile(`${nativePreCommitPath}.bak`, existing);
         await fs.writeFile(nativePreCommitPath, existing + '\n' + nativeHookContent.replace('#!/bin/sh\n', ''), { mode: 0o755 });
-        console.log(chalk.green('\n✓ Integrated Vitix check into your existing pre-commit hook (backed up to pre-commit.bak).'));
+        console.log(chalk.green('\n✓ Integrated Daha check into your existing pre-commit hook (backed up to pre-commit.bak).'));
       } else {
-        console.log(chalk.yellow('\n⚠️  Vitix check is already integrated in your Git pre-commit hook.'));
+        console.log(chalk.yellow('\n⚠️  Daha check is already integrated in your Git pre-commit hook.'));
       }
     } else {
       await fs.writeFile(nativePreCommitPath, nativeHookContent, { mode: 0o755 });
-      console.log(chalk.green('\n✓ Created native Git pre-commit hook containing Vitix check.'));
+      console.log(chalk.green('\n✓ Created native Git pre-commit hook containing Daha check.'));
     }
 
     // Ensure executable on Unix systems

@@ -39,7 +39,7 @@ export const MetricThresholdSchema = z.object({
 
 export type MetricThreshold = z.infer<typeof MetricThresholdSchema>;
 
-export const VitixConfigSchema = z.object({
+export const DahaConfigSchema = z.object({
   routes: z.union([z.array(z.string()), z.literal('auto')]).default('auto'),
   dynamicRouteParams: z.record(z.array(z.any())).optional(),
   thresholds: z.object({
@@ -79,13 +79,13 @@ export const VitixConfigSchema = z.object({
     url: z.string().url().optional(), // Used in --dev mode or pre-existing server
   }).default({}),
   output: z.object({
-    dir: z.string().default('.vitix'),
+    dir: z.string().default('.daha'),
     formats: z.array(z.enum(['html', 'json', 'csv', 'junit'])).default(['html', 'json', 'junit']),
     openReport: z.boolean().default(false),
   }).default({}),
   baseline: z.object({
     enabled: z.boolean().default(false),
-    dir: z.string().default('.vitix/baseline'),
+    dir: z.string().default('.daha/baseline'),
   }).optional(),
   ci: z.object({
     strict: z.boolean().default(true),
@@ -103,8 +103,8 @@ export const VitixConfigSchema = z.object({
   }).default({}),
 });
 
-export type VitixConfig = z.input<typeof VitixConfigSchema>;
-export type ParsedVitixConfig = z.output<typeof VitixConfigSchema>;
+export type DahaConfig = z.input<typeof DahaConfigSchema>;
+export type ParsedDahaConfig = z.output<typeof DahaConfigSchema>;
 
 export interface AuditResult {
   url: string;
@@ -141,7 +141,7 @@ export interface RouteAuditSummary {
   };
 }
 
-export interface VitixRunSummary {
+export interface DahaRunSummary {
   timestamp: string;
   durationMs: number;
   routes: RouteAuditSummary[];

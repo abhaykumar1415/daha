@@ -62,11 +62,11 @@ describe('Route Discovery - Parameter Interpolation', () => {
   it('should interpolate single parameters', () => {
     const route = '/blog/[slug]';
     const params = {
-      '/blog/[slug]': ['hello-world', 'tech-stack-vitix']
+      '/blog/[slug]': ['hello-world', 'tech-stack-daha']
     };
     expect(interpolateRoute(route, params)).toEqual([
       '/blog/hello-world',
-      '/blog/tech-stack-vitix'
+      '/blog/tech-stack-daha'
     ]);
   });
 

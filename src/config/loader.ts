@@ -1,17 +1,17 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import yaml from 'js-yaml';
-import { ParsedVitixConfig, VitixConfigSchema } from '../types/config.js';
+import { ParsedDahaConfig, DahaConfigSchema } from '../types/config.js';
 import { ConfigError } from '../utils/errors.js';
 import esbuild from 'esbuild';
 
 const DEFAULT_CONFIG_FILES = [
-  'vitix.config.ts',
-  'vitix.config.js',
-  'vitix.config.mjs',
-  '.vitixrc.yml',
-  '.vitixrc.yaml',
-  '.vitixrc.json',
+  'daha.config.ts',
+  'daha.config.js',
+  'daha.config.mjs',
+  '.daharc.yml',
+  '.daharc.yaml',
+  '.daharc.json',
 ];
 
 /**
@@ -24,7 +24,7 @@ export async function loadTsFile(filePath: string): Promise<any> {
   }
 
   // Create a temporary file in node_modules or temp dir
-  const tempDir = path.join(process.cwd(), 'node_modules', '.vitix-cache');
+  const tempDir = path.join(process.cwd(), 'node_modules', '.daha-cache');
   await fs.ensureDir(tempDir);
   const tempFile = path.join(tempDir, `config-${Date.now()}.mjs`);
 
@@ -61,7 +61,7 @@ export async function loadTsFile(filePath: string): Promise<any> {
 /**
  * Loads a configuration file from a specified path or defaults.
  */
-export async function loadConfig(configPath?: string): Promise<ParsedVitixConfig> {
+export async function loadConfig(configPath?: string): Promise<ParsedDahaConfig> {
   let foundPath: string | null = null;
 
   if (configPath) {
@@ -84,7 +84,7 @@ export async function loadConfig(configPath?: string): Promise<ParsedVitixConfig
 
   // If no config found, return defaults
   if (!foundPath) {
-    return VitixConfigSchema.parse({});
+    return DahaConfigSchema.parse({});
   }
 
   const ext = path.extname(foundPath).toLowerCase();
@@ -111,7 +111,7 @@ export async function loadConfig(configPath?: string): Promise<ParsedVitixConfig
   }
 
   // Validate loaded config with Zod
-  const validation = VitixConfigSchema.safeParse(rawConfig);
+  const validation = DahaConfigSchema.safeParse(rawConfig);
   if (!validation.success) {
     const errorDetails = validation.error.errors
       .map(err => `  - ${err.path.join('.')}: ${err.message}`)

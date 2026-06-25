@@ -25,7 +25,7 @@ export async function handleWatchCommand(options: WatchOptions): Promise<void> {
   const devPort = options.port || config.server?.port || 3000;
   const devUrl = config.server?.url || `http://localhost:${devPort}`;
 
-  console.log(chalk.bold.cyan('\n👀 Vitix Watcher Active'));
+  console.log(chalk.bold.cyan('\n👀 Daha Watcher Active'));
   console.log(chalk.white(`Listening for filesystem modifications...`));
   console.log(chalk.white(`Expecting development server at: ${chalk.bold.underline(devUrl)}`));
   console.log(chalk.dim('Make sure your framework development server is running (e.g. `npm run dev` or `next dev`).\n'));
@@ -137,7 +137,7 @@ export async function handleWatchCommand(options: WatchOptions): Promise<void> {
       if (!filename) return;
 
       // Ignore standard build/cache directories just in case they reside inside watched directories
-      if (filename.includes('.next') || filename.includes('.vitix') || filename.includes('node_modules')) {
+      if (filename.includes('.next') || filename.includes('.daha') || filename.includes('node_modules')) {
         return;
       }
 

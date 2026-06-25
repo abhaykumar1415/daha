@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { VitixConfigSchema } from '../src/types/config.js';
+import { DahaConfigSchema } from '../src/types/config.js';
 
 describe('Config Schema Validation', () => {
   it('should parse empty config and apply defaults', () => {
-    const parsed = VitixConfigSchema.parse({});
+    const parsed = DahaConfigSchema.parse({});
     expect(parsed.routes).toBe('auto');
     expect(parsed.options.numberOfRuns).toBe(3);
     expect(parsed.options.preset).toBe('mobile');
@@ -11,7 +11,7 @@ describe('Config Schema Validation', () => {
     expect(parsed.build.command).toBe('npm run build');
     expect(parsed.build.dir).toBe('.next');
     expect(parsed.server.command).toBe('npm run start');
-    expect(parsed.output.dir).toBe('.vitix');
+    expect(parsed.output.dir).toBe('.daha');
     expect(parsed.output.formats).toEqual(['html', 'json', 'junit']);
   });
 
@@ -37,7 +37,7 @@ describe('Config Schema Validation', () => {
       }
     };
 
-    const parsed = VitixConfigSchema.parse(config);
+    const parsed = DahaConfigSchema.parse(config);
     expect(parsed.routes).toEqual(['/', '/about', '/blog/[slug]']);
     expect(parsed.options.numberOfRuns).toBe(5);
     expect(parsed.options.preset).toBe('desktop');
@@ -54,7 +54,7 @@ describe('Config Schema Validation', () => {
       }
     };
 
-    const result = VitixConfigSchema.safeParse(invalidConfig);
+    const result = DahaConfigSchema.safeParse(invalidConfig);
     expect(result.success).toBe(false);
     if (!result.success) {
       const errs = result.error.errors;

@@ -2,9 +2,9 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 
-const DEFAULT_CONFIG_TEMPLATE = `import { VitixConfig } from 'vitix';
+const DEFAULT_CONFIG_TEMPLATE = `import { DahaConfig } from 'daha';
 
-const config: VitixConfig = {
+const config: DahaConfig = {
   // Routes to audit. 'auto' discovers all App and Pages router paths automatically.
   routes: 'auto',
 
@@ -51,7 +51,7 @@ const config: VitixConfig = {
 
   // Output directories and formats
   output: {
-    dir: '.vitix',
+    dir: '.daha',
     formats: ['html', 'json', 'junit'],
     openReport: false,
   },
@@ -64,7 +64,7 @@ export default config;
  * Initializes a default configuration file in the working directory.
  */
 export async function handleInitCommand(): Promise<void> {
-  const targetPath = path.join(process.cwd(), 'vitix.config.ts');
+  const targetPath = path.join(process.cwd(), 'daha.config.ts');
 
   if (await fs.pathExists(targetPath)) {
     console.log(chalk.yellow(`\n⚠️  Configuration file already exists at ${targetPath}`));
@@ -74,7 +74,7 @@ export async function handleInitCommand(): Promise<void> {
 
   try {
     await fs.writeFile(targetPath, DEFAULT_CONFIG_TEMPLATE, 'utf8');
-    console.log(chalk.green(`\n✓ Successfully initialized Vitix configuration file!`));
+    console.log(chalk.green(`\n✓ Successfully initialized Daha configuration file!`));
     console.log(chalk.white(`Created config at: ${chalk.bold(targetPath)}\n`));
   } catch (error: any) {
     console.error(chalk.red(`Failed to create configuration file: ${error.message}`));

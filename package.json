@@ -1,5 +1,5 @@
 {
-  "name": "vitix",
+  "name": "daha",
   "version": "1.0.0",
   "description": "Performance as Code for Next.js - Core Web Vitals and Lighthouse Audits CLI",
   "type": "module",
@@ -13,7 +13,7 @@
     }
   },
   "bin": {
-    "vitix": "./dist/bin.js"
+    "daha": "./dist/bin.js"
   },
   "files": [
     "dist"

@@ -1,7 +1,7 @@
 import net from 'node:net';
 import { execa } from 'execa';
 import { ServerError } from './errors.js';
-import { ParsedVitixConfig } from '../types/config.js';
+import { ParsedDahaConfig } from '../types/config.js';
 import chalk from 'chalk';
 
 /**
@@ -34,7 +34,7 @@ export async function findFreePort(startPort = 3000): Promise<number> {
 /**
  * Builds the project using the configured command.
  */
-export async function buildProject(config: ParsedVitixConfig, projectDir: string, verbose = false): Promise<void> {
+export async function buildProject(config: ParsedDahaConfig, projectDir: string, verbose = false): Promise<void> {
   const command = config.build?.command || 'npm run build';
   if (verbose) {
     console.log(chalk.dim(`Running build command: "${command}"`));
@@ -80,7 +80,7 @@ async function waitForServer(url: string, timeoutMs: number): Promise<void> {
       const res = await fetch(url, { 
         method: 'GET',
         signal: controller.signal,
-        headers: { 'User-Agent': 'Vitix-Server-Checker' }
+        headers: { 'User-Agent': 'Daha-Server-Checker' }
       });
       
       clearTimeout(id);
@@ -102,7 +102,7 @@ async function waitForServer(url: string, timeoutMs: number): Promise<void> {
  * Starts the production server and waits for it to be ready.
  */
 export async function startServer(
-  config: ParsedVitixConfig,
+  config: ParsedDahaConfig,
   projectDir: string,
   verbose = false
 ): Promise<ServerInstance> {

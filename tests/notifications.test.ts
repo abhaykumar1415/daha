@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { dispatchWebhook } from '../src/utils/notifications.js';
-import { VitixRunSummary, ParsedVitixConfig } from '../src/types/config.js';
+import { DahaRunSummary, ParsedDahaConfig } from '../src/types/config.js';
 
 describe('Notifications Webhook', () => {
   let fetchMock: any;
 
-  const mockSummaryPassed: VitixRunSummary = {
+  const mockSummaryPassed: DahaRunSummary = {
     timestamp: '2026-06-25T14:00:00.000Z',
     durationMs: 10000,
     passed: true,
@@ -33,7 +33,7 @@ describe('Notifications Webhook', () => {
     ]
   };
 
-  const mockSummaryFailed: VitixRunSummary = {
+  const mockSummaryFailed: DahaRunSummary = {
     timestamp: '2026-06-25T14:00:00.000Z',
     durationMs: 12000,
     passed: false,
@@ -76,13 +76,13 @@ describe('Notifications Webhook', () => {
   });
 
   it('should not dispatch if no webhookUrl is configured', async () => {
-    const config: ParsedVitixConfig = {
+    const config: ParsedDahaConfig = {
       routes: 'auto',
       thresholds: {},
       options: { numberOfRuns: 3, preset: 'mobile', concurrency: 1, timeoutMs: 60000, chromeFlags: [] },
       build: { command: 'npm run build', dir: '.next' },
       server: { command: 'npm run start' },
-      output: { dir: '.vitix', formats: ['html', 'json', 'junit'], openReport: false },
+      output: { dir: '.daha', formats: ['html', 'json', 'junit'], openReport: false },
       ci: { strict: true, junit: true },
       notifications: { webhookUrl: undefined, onFailureOnly: true },
       rum: {}
@@ -93,13 +93,13 @@ describe('Notifications Webhook', () => {
   });
 
   it('should respect onFailureOnly settings', async () => {
-    const config: ParsedVitixConfig = {
+    const config: ParsedDahaConfig = {
       routes: 'auto',
       thresholds: {},
       options: { numberOfRuns: 3, preset: 'mobile', concurrency: 1, timeoutMs: 60000, chromeFlags: [] },
       build: { command: 'npm run build', dir: '.next' },
       server: { command: 'npm run start' },
-      output: { dir: '.vitix', formats: ['html', 'json', 'junit'], openReport: false },
+      output: { dir: '.daha', formats: ['html', 'json', 'junit'], openReport: false },
       ci: { strict: true, junit: true },
       notifications: { webhookUrl: 'https://example.com/webhook', onFailureOnly: true },
       rum: {}
@@ -121,13 +121,13 @@ describe('Notifications Webhook', () => {
   });
 
   it('should send correctly formatted Slack blocks payload', async () => {
-    const config: ParsedVitixConfig = {
+    const config: ParsedDahaConfig = {
       routes: 'auto',
       thresholds: {},
       options: { numberOfRuns: 3, preset: 'mobile', concurrency: 1, timeoutMs: 60000, chromeFlags: [] },
       build: { command: 'npm run build', dir: '.next' },
       server: { command: 'npm run start' },
-      output: { dir: '.vitix', formats: ['html', 'json', 'junit'], openReport: false },
+      output: { dir: '.daha', formats: ['html', 'json', 'junit'], openReport: false },
       ci: { strict: true, junit: true },
       notifications: { webhookUrl: 'https://hooks.slack.com/services/mock-slack-webhook-url', onFailureOnly: false },
       rum: {}
@@ -142,18 +142,18 @@ describe('Notifications Webhook', () => {
     
     const body = JSON.parse(requestOptions.body);
     expect(body).toHaveProperty('blocks');
-    expect(body.blocks[0].text.text).toContain('Vitix Performance Check: FAILED');
+    expect(body.blocks[0].text.text).toContain('Daha Performance Check: FAILED');
     expect(body.blocks[2].text.text).toContain('Performance: *80*');
   });
 
   it('should send correctly formatted Discord embeds payload', async () => {
-    const config: ParsedVitixConfig = {
+    const config: ParsedDahaConfig = {
       routes: 'auto',
       thresholds: {},
       options: { numberOfRuns: 3, preset: 'mobile', concurrency: 1, timeoutMs: 60000, chromeFlags: [] },
       build: { command: 'npm run build', dir: '.next' },
       server: { command: 'npm run start' },
-      output: { dir: '.vitix', formats: ['html', 'json', 'junit'], openReport: false },
+      output: { dir: '.daha', formats: ['html', 'json', 'junit'], openReport: false },
       ci: { strict: true, junit: true },
       notifications: { webhookUrl: 'https://discord.com/api/webhooks/1234567890/abcde', onFailureOnly: false },
       rum: {}
@@ -166,19 +166,19 @@ describe('Notifications Webhook', () => {
     
     const body = JSON.parse(requestOptions.body);
     expect(body).toHaveProperty('embeds');
-    expect(body.embeds[0].title).toContain('Vitix Performance Check: PASSED');
+    expect(body.embeds[0].title).toContain('Daha Performance Check: PASSED');
     expect(body.embeds[0].color).toBe(0x10b981); // Green color code
     expect(body.embeds[0].fields[0].value).toContain('Performance: **95**');
   });
 
   it('should send correctly formatted Generic JSON payload', async () => {
-    const config: ParsedVitixConfig = {
+    const config: ParsedDahaConfig = {
       routes: 'auto',
       thresholds: {},
       options: { numberOfRuns: 3, preset: 'mobile', concurrency: 1, timeoutMs: 60000, chromeFlags: [] },
       build: { command: 'npm run build', dir: '.next' },
       server: { command: 'npm run start' },
-      output: { dir: '.vitix', formats: ['html', 'json', 'junit'], openReport: false },
+      output: { dir: '.daha', formats: ['html', 'json', 'junit'], openReport: false },
       ci: { strict: true, junit: true },
       notifications: { webhookUrl: 'https://example.com/custom-webhook', onFailureOnly: false },
       rum: {}

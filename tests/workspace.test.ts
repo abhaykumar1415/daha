@@ -35,10 +35,10 @@ describe('Monorepo Workspace Scanner & Report Generator', () => {
       await fs.ensureDir(pkgA);
       await fs.ensureDir(ignoredDir);
 
-      // Write vitix.config.ts to target packages
-      await fs.outputFile(path.join(app1, 'vitix.config.ts'), 'export default {}');
-      await fs.outputFile(path.join(app2, 'vitix.config.js'), 'module.exports = {}');
-      await fs.outputFile(path.join(pkgA, '.vitixrc.yaml'), 'thresholds: {}');
+      // Write daha.config.ts to target packages
+      await fs.outputFile(path.join(app1, 'daha.config.ts'), 'export default {}');
+      await fs.outputFile(path.join(app2, 'daha.config.js'), 'module.exports = {}');
+      await fs.outputFile(path.join(pkgA, '.daharc.yaml'), 'thresholds: {}');
 
       // Call scanner
       const foundPackages = await findWorkspacePackages(tempTestDir);
@@ -68,8 +68,8 @@ packages:
       await fs.ensureDir(pkg1);
       await fs.ensureDir(excluded);
 
-      await fs.outputFile(path.join(pkg1, 'vitix.config.ts'), 'export default {}');
-      await fs.outputFile(path.join(excluded, 'vitix.config.ts'), 'export default {}');
+      await fs.outputFile(path.join(pkg1, 'daha.config.ts'), 'export default {}');
+      await fs.outputFile(path.join(excluded, 'daha.config.ts'), 'export default {}');
 
       const foundPackages = await findWorkspacePackages(tempTestDir);
       const normalizedFound = foundPackages.map(p => path.relative(tempTestDir, p).replace(/\\/g, '/'));
@@ -78,7 +78,7 @@ packages:
       expect(normalizedFound).not.toContain('packages/excluded');
     });
 
-    it('should fallback to scanning direct folders containing vitix configs if no workspaces defined', async () => {
+    it('should fallback to scanning direct folders containing daha configs if no workspaces defined', async () => {
       await fs.ensureDir(tempTestDir);
 
       const projectA = path.join(tempTestDir, 'project-a');
@@ -87,8 +87,8 @@ packages:
       await fs.ensureDir(projectA);
       await fs.ensureDir(projectB);
 
-      await fs.outputFile(path.join(projectA, 'vitix.config.ts'), '');
-      await fs.outputFile(path.join(projectB, 'vitix.config.js'), '');
+      await fs.outputFile(path.join(projectA, 'daha.config.ts'), '');
+      await fs.outputFile(path.join(projectB, 'daha.config.js'), '');
 
       const foundPackages = await findWorkspacePackages(tempTestDir);
       const normalizedFound = foundPackages.map(p => path.relative(tempTestDir, p).replace(/\\/g, '/'));

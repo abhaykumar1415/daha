@@ -1,4 +1,4 @@
-import { AuditResult, ParsedVitixConfig, RouteAuditSummary } from '../types/config.js';
+import { AuditResult, ParsedDahaConfig, RouteAuditSummary } from '../types/config.js';
 import { CoreWebVitalKey, LighthouseCategory } from '../types/config.js';
 
 /**
@@ -84,7 +84,7 @@ export function analyzeRouteRuns(
   route: string,
   url: string,
   runs: AuditResult[],
-  config: ParsedVitixConfig
+  config: ParsedDahaConfig
 ): RouteAuditSummary {
   const medianRun = getMedianRun(runs);
   const averages = calculateAverages(runs);

@@ -31,7 +31,7 @@ const SERVE_DASHBOARD_HTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vitix Historical Runs Dashboard</title>
+  <title>Daha Historical Runs Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -229,7 +229,7 @@ const SERVE_DASHBOARD_HTML = `<!DOCTYPE html>
   <div class="container">
     <header>
       <div>
-        <h1>Vitix Historical Runs</h1>
+        <h1>Daha Historical Runs</h1>
         <div class="subtitle">Analyze local web performance metrics over time</div>
       </div>
       <div>
@@ -262,7 +262,7 @@ const SERVE_DASHBOARD_HTML = `<!DOCTYPE html>
         </table>
         <div id="noDataContainer" class="no-data" style="display: none;">
           <h3>No Audits Run Yet</h3>
-          <p>Run <code>vitix audit</code> to generate your first performance report.</p>
+          <p>Run <code>daha audit</code> to generate your first performance report.</p>
         </div>
       </div>
     </div>
@@ -459,7 +459,7 @@ const SERVE_DASHBOARD_HTML = `<!DOCTYPE html>
 
 export async function handleServeCommand(options: ServeOptions): Promise<void> {
   const config = await loadConfig(options.config);
-  const baseOutputDir = path.resolve(process.cwd(), config.output?.dir || '.vitix');
+  const baseOutputDir = path.resolve(process.cwd(), config.output?.dir || '.daha');
   const historyPath = path.join(baseOutputDir, 'history.json');
 
   let port = parseInt(options.port || '4000', 10);
@@ -491,7 +491,7 @@ export async function handleServeCommand(options: ServeOptions): Promise<void> {
       return;
     }
 
-    // 3. serve static files from .vitix
+    // 3. serve static files from .daha
     // Resolve filePath, preventing directory traversal
     const relativePath = decodeURIComponent(urlPath).replace(/^\//, '');
     const targetFilePath = path.join(baseOutputDir, relativePath);
@@ -517,7 +517,7 @@ export async function handleServeCommand(options: ServeOptions): Promise<void> {
   const startServer = (portNum: number) => {
     server.listen(portNum, host, async () => {
       const serverUrl = `http://${host}:${portNum}`;
-      console.log(chalk.green(`\n🚀 Vitix Serve Dashboard is active!`));
+      console.log(chalk.green(`\n🚀 Daha Serve Dashboard is active!`));
       console.log(chalk.white(`Dashboard URL: ${chalk.bold.underline(serverUrl)}`));
       console.log(chalk.dim(`Serving history database from: ${historyPath}\n`));
 

@@ -2,20 +2,20 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import path from 'node:path';
 import fs from 'fs-extra';
 import { compareWithBaseline } from '../src/reporter/index.js';
-import { VitixRunSummary, ParsedVitixConfig } from '../src/types/config.js';
+import { DahaRunSummary, ParsedDahaConfig } from '../src/types/config.js';
 
 const TEST_DIR = path.resolve(process.cwd(), 'tests/temp_ci_test');
 
 describe('CI Regression Checks', () => {
   const baselineJsonPath = path.join(TEST_DIR, 'summary.json');
   
-  const mockConfig: ParsedVitixConfig = {
+  const mockConfig: ParsedDahaConfig = {
     routes: 'auto',
     thresholds: {},
     options: { numberOfRuns: 3, preset: 'mobile', concurrency: 1, timeoutMs: 60000, chromeFlags: [], framework: 'auto' },
     build: { command: 'npm run build', dir: '.next' },
     server: { command: 'npm run start' },
-    output: { dir: '.vitix', formats: ['json'], openReport: false },
+    output: { dir: '.daha', formats: ['json'], openReport: false },
     ci: {
       strict: true,
       junit: true,
@@ -27,7 +27,7 @@ describe('CI Regression Checks', () => {
   };
 
   // Mock baseline run
-  const mockBaseline: VitixRunSummary = {
+  const mockBaseline: DahaRunSummary = {
     timestamp: '2026-06-25T12:00:00.000Z',
     durationMs: 10000,
     passed: true,
@@ -65,7 +65,7 @@ describe('CI Regression Checks', () => {
   });
 
   it('should pass if regression is within tolerances', async () => {
-    const currentRun: VitixRunSummary = {
+    const currentRun: DahaRunSummary = {
       timestamp: '2026-06-25T13:00:00.000Z',
       durationMs: 10000,
       passed: true,
@@ -112,7 +112,7 @@ describe('CI Regression Checks', () => {
   });
 
   it('should fail and report violation when performance drop exceeds category limits', async () => {
-    const currentRun: VitixRunSummary = {
+    const currentRun: DahaRunSummary = {
       timestamp: '2026-06-25T13:00:00.000Z',
       durationMs: 10000,
       passed: true,
@@ -158,7 +158,7 @@ describe('CI Regression Checks', () => {
   });
 
   it('should fail and report violation when metric increase exceeds limits', async () => {
-    const currentRun: VitixRunSummary = {
+    const currentRun: DahaRunSummary = {
       timestamp: '2026-06-25T13:00:00.000Z',
       durationMs: 10000,
       passed: true,

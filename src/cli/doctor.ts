@@ -18,7 +18,7 @@ interface DiagnosticResult {
 }
 
 export async function handleDoctorCommand(_options: DoctorOptions): Promise<void> {
-  console.log(chalk.bold.cyan('\n🩺 Running Vitix Doctor diagnostics...\n'));
+  console.log(chalk.bold.cyan('\n🩺 Running Daha Doctor diagnostics...\n'));
 
   const projectDir = process.cwd();
   const diagnostics: DiagnosticResult[] = [];
@@ -109,7 +109,7 @@ export async function handleDoctorCommand(_options: DoctorOptions): Promise<void
       category: 'dependency',
       status: 'warn',
       title: 'package.json not found',
-      message: 'Ensure you run Vitix inside a Node project directory.',
+      message: 'Ensure you run Daha inside a Node project directory.',
     });
   }
 

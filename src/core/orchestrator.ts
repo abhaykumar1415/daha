@@ -4,7 +4,7 @@ import ora from 'ora';
 import cliProgress from 'cli-progress';
 import chalk from 'chalk';
 import open from 'open';
-import { ParsedVitixConfig, VitixRunSummary, RouteAuditSummary, AuditResult } from '../types/config.js';
+import { ParsedDahaConfig, DahaRunSummary, RouteAuditSummary, AuditResult } from '../types/config.js';
 import { discoverRoutes } from '../discovery/index.js';
 import { buildProject, startServer, ServerInstance } from '../utils/server.js';
 import { runSingleAudit } from '../lighthouse/index.js';
@@ -16,11 +16,11 @@ import {
   printBaselineComparison,
   updateHistoryCatalog
 } from '../reporter/index.js';
-import { VitixError } from '../utils/errors.js';
+import { DahaError } from '../utils/errors.js';
 import { dispatchWebhook } from '../utils/notifications.js';
 
 export interface AuditRunOptions {
-  config: ParsedVitixConfig;
+  config: ParsedDahaConfig;
   devMode?: boolean;
   ciMode?: boolean;
   baselineMode?: boolean;
@@ -30,9 +30,9 @@ export interface AuditRunOptions {
 }
 
 /**
- * Main orchestrator running the full Vitix audit lifecycle.
+ * Main orchestrator running the full Daha audit lifecycle.
  */
-export async function runAudit(options: AuditRunOptions): Promise<VitixRunSummary> {
+export async function runAudit(options: AuditRunOptions): Promise<DahaRunSummary> {
   const { config, devMode = false, ciMode = false, baselineMode = false, presetOverride, routeOverride, verbose = false } = options;
   const projectDir = process.cwd();
   const startTime = Date.now();
@@ -102,11 +102,11 @@ export async function runAudit(options: AuditRunOptions): Promise<VitixRunSummar
     }
 
     if (discoveryResult.routes.length === 0) {
-      throw new VitixError('No routes were discovered to audit.', 'NO_ROUTES');
+      throw new DahaError('No routes were discovered to audit.', 'NO_ROUTES');
     }
 
     // Initialize timestamped run folder paths
-    const baseOutputDir = path.join(projectDir, config.output?.dir || '.vitix');
+    const baseOutputDir = path.join(projectDir, config.output?.dir || '.daha');
     const timestampStr = new Date().toISOString().replace(/[-T:]/g, '').split('.')[0]; // e.g. 20260625_133000
     const runId = `run_${timestampStr}`;
     const runOutputDir = path.join(baseOutputDir, 'runs', runId);
@@ -128,7 +128,7 @@ export async function runAudit(options: AuditRunOptions): Promise<VitixRunSummar
     });
 
     if (filteredRoutes.length === 0) {
-      throw new VitixError('No valid static or interpolated dynamic routes found for auditing.', 'NO_ROUTES');
+      throw new DahaError('No valid static or interpolated dynamic routes found for auditing.', 'NO_ROUTES');
     }
 
     // 5. Multi-run Lighthouse Audit Execution
@@ -235,7 +235,7 @@ export async function runAudit(options: AuditRunOptions): Promise<VitixRunSummar
       if (!r.passed) allPassed = false;
     }
 
-    const summary: VitixRunSummary = {
+    const summary: DahaRunSummary = {
       timestamp: new Date().toISOString(),
       durationMs: Date.now() - startTime,
       routes: routeSummaries,
@@ -243,7 +243,7 @@ export async function runAudit(options: AuditRunOptions): Promise<VitixRunSummar
     };
 
     // 7. Baseline Comparison
-    const baselineDir = config.baseline?.dir || '.vitix/baseline';
+    const baselineDir = config.baseline?.dir || '.daha/baseline';
     const isBaselineEnabled = config.baseline?.enabled || baselineMode;
 
     if (isBaselineEnabled) {

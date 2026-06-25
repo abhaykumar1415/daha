@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import chalk from 'chalk';
 import { table } from 'table';
 import builder from 'junit-report-builder';
-import { VitixRunSummary, ParsedVitixConfig, CoreWebVitalKey, LighthouseCategory } from '../types/config.js';
+import { DahaRunSummary, ParsedDahaConfig, CoreWebVitalKey, LighthouseCategory } from '../types/config.js';
 
 /**
  * Returns the classification (Good, Needs Improvement, Poor) and color code for Core Web Vitals.
@@ -55,8 +55,8 @@ export function getScoreColor(score: number): string {
 /**
  * Generates and prints the colorful terminal summary table.
  */
-export function printTerminalReport(summary: VitixRunSummary): void {
-  console.log('\n' + chalk.bold.cyan('=== Vitix Audit Results ===') + '\n');
+export function printTerminalReport(summary: DahaRunSummary): void {
+  console.log('\n' + chalk.bold.cyan('=== Daha Audit Results ===') + '\n');
 
   const headers = [
     chalk.bold('Route'),
@@ -140,8 +140,8 @@ function formatTerminalMetric(metric: CoreWebVitalKey, value: number, text: stri
  * Generates and saves JSON, CSV, JUnit, and HTML reports.
  */
 export async function writeReports(
-  summary: VitixRunSummary,
-  config: ParsedVitixConfig,
+  summary: DahaRunSummary,
+  config: ParsedDahaConfig,
   outputDir: string
 ): Promise<void> {
   await fs.ensureDir(outputDir);
@@ -168,7 +168,7 @@ export async function writeReports(
   // 3. JUnit XML Exporter
   if (formats.includes('junit')) {
     const junitPath = path.join(outputDir, 'junit.xml');
-    const suite = builder.testSuite().name('Vitix Lighthouse Audits');
+    const suite = builder.testSuite().name('Daha Lighthouse Audits');
     
     for (const r of summary.routes) {
       const firstTime = r.runs.length > 0 ? new Date(r.runs[0].timestamp).getTime() : 0;
@@ -232,18 +232,18 @@ export async function writeReports(
  * Builds baseline diffs if baseline is enabled and exists.
  */
 export async function compareWithBaseline(
-  currentSummary: VitixRunSummary,
+  currentSummary: DahaRunSummary,
   baselineDir: string,
-  config: ParsedVitixConfig
-): Promise<VitixRunSummary['baselineDiffs'] | undefined> {
+  config: ParsedDahaConfig
+): Promise<DahaRunSummary['baselineDiffs'] | undefined> {
   const baselineJsonPath = path.join(baselineDir, 'summary.json');
   if (!await fs.pathExists(baselineJsonPath)) {
     return undefined;
   }
 
   try {
-    const baselineSummary: VitixRunSummary = await fs.readJson(baselineJsonPath);
-    const diffs: NonNullable<VitixRunSummary['baselineDiffs']> = {};
+    const baselineSummary: DahaRunSummary = await fs.readJson(baselineJsonPath);
+    const diffs: NonNullable<DahaRunSummary['baselineDiffs']> = {};
 
     for (const currentRoute of currentSummary.routes) {
       const baselineRoute = baselineSummary.routes.find(
@@ -312,7 +312,7 @@ export async function compareWithBaseline(
 /**
  * Outputs baseline comparisons to the console.
  */
-export function printBaselineComparison(diffs: NonNullable<VitixRunSummary['baselineDiffs']>): void {
+export function printBaselineComparison(diffs: NonNullable<DahaRunSummary['baselineDiffs']>): void {
   console.log(chalk.bold.cyan('\n=== Baseline Performance Comparison ===\n'));
 
   for (const [route, routeDiffs] of Object.entries(diffs)) {
@@ -376,7 +376,7 @@ export function printBaselineComparison(diffs: NonNullable<VitixRunSummary['base
 /**
  * Builds a modern dark-mode responsive glassmorphic HTML Dashboard template.
  */
-function generateHtmlDashboard(summary: VitixRunSummary): string {
+function generateHtmlDashboard(summary: DahaRunSummary): string {
   const totalRoutes = summary.routes.length;
   const passedRoutes = summary.routes.filter(r => r.passed).length;
   const failedRoutes = totalRoutes - passedRoutes;
@@ -540,7 +540,7 @@ function generateHtmlDashboard(summary: VitixRunSummary): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vitix - Web Vitals CLI Dashboard</title>
+  <title>Daha - Web Vitals CLI Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -1026,8 +1026,8 @@ function generateHtmlDashboard(summary: VitixRunSummary): string {
   <header>
     <div class="header-container">
       <div class="logo-container">
-        <span class="logo-icon">V</span>
-        <span class="logo-text">VITIX</span>
+        <span class="logo-icon">D</span>
+        <span class="logo-text">DAHA</span>
         <span class="logo-tagline">Performance as Code</span>
       </div>
       <div class="meta-time">Audited at: ${timestamp}</div>
@@ -1071,7 +1071,7 @@ function generateHtmlDashboard(summary: VitixRunSummary): string {
   </main>
 
   <footer>
-    <p>Vitix CLI v1.0.0 — Performance as Code for Next.js and React</p>
+    <p>Daha CLI v1.0.0 — Performance as Code for Next.js and React</p>
   </footer>
 
   <script>
@@ -1108,7 +1108,7 @@ function generateHtmlDashboard(summary: VitixRunSummary): string {
 export async function updateHistoryCatalog(
   baseOutputDir: string,
   runId: string,
-  summary: VitixRunSummary
+  summary: DahaRunSummary
 ): Promise<void> {
   const historyPath = path.join(baseOutputDir, 'history.json');
   let history: any[] = [];
@@ -1159,11 +1159,11 @@ export async function updateHistoryCatalog(
   await fs.writeJson(historyPath, history, { spaces: 2 });
 }
 
-export function generatePrCommentMarkdown(summary: VitixRunSummary): string {
+export function generatePrCommentMarkdown(summary: DahaRunSummary): string {
   const statusEmoji = summary.passed ? '🟢' : '🔴';
   const statusText = summary.passed ? 'PASSED' : 'FAILED';
   
-  let md = `## ${statusEmoji} Vitix Performance Check: **${statusText}**\n\n`;
+  let md = `## ${statusEmoji} Daha Performance Check: **${statusText}**\n\n`;
   md += `*Audited at: ${new Date(summary.timestamp).toUTCString()}*\n`;
   md += `*Total duration: ${(summary.durationMs / 1000).toFixed(2)}s*\n\n`;
 

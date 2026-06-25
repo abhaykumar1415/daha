@@ -1,6 +1,6 @@
-import { VitixRunSummary, ParsedVitixConfig } from '../types/config.js';
+import { DahaRunSummary, ParsedDahaConfig } from '../types/config.js';
 
-export async function dispatchWebhook(summary: VitixRunSummary, config: ParsedVitixConfig): Promise<void> {
+export async function dispatchWebhook(summary: DahaRunSummary, config: ParsedDahaConfig): Promise<void> {
   const webhookUrl = config.notifications?.webhookUrl;
   const onFailureOnly = config.notifications?.onFailureOnly ?? true;
 
@@ -38,7 +38,7 @@ export async function dispatchWebhook(summary: VitixRunSummary, config: ParsedVi
         type: 'header',
         text: {
           type: 'plain_text',
-          text: `⚡ Vitix Performance Check: ${summary.passed ? 'PASSED' : 'FAILED'}`,
+          text: `⚡ Daha Performance Check: ${summary.passed ? 'PASSED' : 'FAILED'}`,
           emoji: true,
         },
       },
@@ -61,7 +61,7 @@ export async function dispatchWebhook(summary: VitixRunSummary, config: ParsedVi
         elements: [
           {
             type: 'plain_text',
-            text: 'Audited by Vitix Platform',
+            text: 'Audited by Daha Platform',
           },
         ],
       },
@@ -70,7 +70,7 @@ export async function dispatchWebhook(summary: VitixRunSummary, config: ParsedVi
   } else if (isDiscord) {
     // Discord Embed format
     const embed = {
-      title: `⚡ Vitix Performance Check: ${summary.passed ? 'PASSED' : 'FAILED'}`,
+      title: `⚡ Daha Performance Check: ${summary.passed ? 'PASSED' : 'FAILED'}`,
       description: `**Timestamp:** ${new Date(summary.timestamp).toUTCString()}\n**Routes Count:** ${totalRoutes}\n**Duration:** ${(summary.durationMs / 1000).toFixed(2)}s`,
       color: summary.passed ? 0x10b981 : 0xef4444, // Green vs Red
       fields: [
@@ -80,7 +80,7 @@ export async function dispatchWebhook(summary: VitixRunSummary, config: ParsedVi
         },
       ],
       footer: {
-        text: 'Audited by Vitix Platform',
+        text: 'Audited by Daha Platform',
       },
     };
     body = JSON.stringify({ embeds: [embed] });
@@ -107,9 +107,9 @@ export async function dispatchWebhook(summary: VitixRunSummary, config: ParsedVi
       body,
     });
     if (!res.ok) {
-      console.warn(`[Vitix Webhook] Failed to deliver alert: ${res.statusText}`);
+      console.warn(`[Daha Webhook] Failed to deliver alert: ${res.statusText}`);
     }
   } catch (err: any) {
-    console.warn(`[Vitix Webhook] Error sending webhook payload: ${err.message}`);
+    console.warn(`[Daha Webhook] Error sending webhook payload: ${err.message}`);
   }
 }

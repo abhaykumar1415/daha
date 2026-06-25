@@ -38,5 +38,5 @@ RUN npm run build
 RUN npm link
 
 # Default command displays help
-ENTRYPOINT ["vitix"]
+ENTRYPOINT ["daha"]
 CMD ["--help"]

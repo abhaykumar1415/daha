@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { generatePrCommentMarkdown } from '../src/reporter/index.js';
-import { VitixRunSummary } from '../src/types/config.js';
+import { DahaRunSummary } from '../src/types/config.js';
 
 describe('PR Comment Markdown Exporter', () => {
   it('should generate a formatted markdown report matching PR comment conventions', () => {
-    const mockSummary: VitixRunSummary = {
+    const mockSummary: DahaRunSummary = {
       timestamp: '2026-06-25T14:00:00.000Z',
       durationMs: 15300,
       passed: false,
@@ -44,7 +44,7 @@ describe('PR Comment Markdown Exporter', () => {
     const markdown = generatePrCommentMarkdown(mockSummary);
 
     // 1. Check title & duration
-    expect(markdown).toContain('Vitix Performance Check: **FAILED**');
+    expect(markdown).toContain('Daha Performance Check: **FAILED**');
     expect(markdown).toContain('Total duration: 15.30s');
     
     // 2. Check Routes table
