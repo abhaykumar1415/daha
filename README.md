@@ -1,37 +1,38 @@
 # Vitix
 
 [![npm version](https://img.shields.io/npm/v/vitix.svg?style=flat-square)](https://www.npmjs.com/package/vitix)
-[![build status](https://img.shields.io/github/actions/workflow/status/abhaykumar/vitix/ci.yml?branch=main&style=flat-square)](#)
 [![node version](https://img.shields.io/badge/node-%3E%3D20.0.0-blue?style=flat-square)](https://nodejs.org)
 [![license](https://img.shields.io/npm/l/vitix.svg?style=flat-square)](https://github.com/abhaykumar/vitix/blob/main/LICENSE)
 
-> **Performance as Code for Next.js & React Applications**
+> **Performance as Code for Modern Web Applications (Next.js, Remix, Astro, SvelteKit)**
 
-**Vitix** is a developer-focused CLI tool that automates Lighthouse audits on production builds. It discovers routes automatically from your Next.js directory (supporting App Router & Pages Router), executes reliable performance audits, asserts Core Web Vitals thresholds, and exports detailed summaries and a premium HTML dashboard.
+**Vitix** is an enterprise-ready performance engineering CLI tool that automates Lighthouse audits, tracks Core Web Vitals, and monitors regressions across web applications and monorepos. 
+
+It discovers routes automatically, runs isolated Lighthouse audits via Playwright, compares results against historical baselines, fetches real-user metrics (RUM) via the Chrome UX Report (CrUX) API, and notifies developers through Slack/Discord webhook alerts.
 
 ---
 
-## Features
+## Key Features
 
-- **Project & Environment Auto-Detection**: Supports Next.js App Router (`app/` page directories) and Pages Router (`pages/` files).
-- **Advanced Route Discovery**: Traverses the filesystem or compiled `.next` build manifests to find public paths while ignoring parallel slots (`@*`), private folders (`_*`), and API routes.
-- **Dynamic Parameter Expansion**: Resolves parameterized routes (e.g. `/blog/[slug]`) into concrete paths using parameter mappings from config.
-- **Programmatic Lighthouse runner**: Orchestrated via Playwright. Executes multiple runs per route to calculate a stable median score.
-- **CI Integration Ready**: Generates standard JUnit XML files and exits with code `1` on threshold violations to fail CI pipelines.
-- **Baseline Metrics Comparisons**: Enables checking current performance changes against previous runs, highlighting regressions.
-- **Rich Dashboard Reporting**: Creates clean terminal summary tables and exports a glassmorphic dark-mode HTML dashboard.
+- ⚡ **Cross-Framework Route Discovery**: Auto-scans directory files and manifests to map static and dynamic pages for **Next.js** (App and Pages routers), **Remix** (including flat routing), **Astro**, and **SvelteKit**.
+- 🛠️ **Programmatic Worker Pool**: Runs multiple audits per route concurrently to calculate a stable median metric, avoiding variance issues. Supports authentication and cookies injection using Playwright.
+- 📈 **PR Regression Guard**: Intercepts pull requests, compares audits to baseline files, and fails CI pipelines if performance drops beyond customizable margins.
+- 🌐 **Real-User Metrics (RUM)**: Queries Google's Chrome UX Report (CrUX) API to overlay real-user field experiences side-by-side with synthetic lab audits.
+- 💬 **ChatOps Webhook Alerts**: Formats and dispatches detailed test outcomes directly to developer channels on **Slack** (Block Kit format) or **Discord** (Embed formatting) on failure.
+- 📦 **Monorepo Workspaces**: Scans root projects (Yarn, NPM, PNPM workspaces), runs concurrent package audits in isolation, and outputs a unified central workspace dashboard.
+- 🐳 **Consistent Sandboxed Audits**: Launches single-command audits inside a Docker container (`--docker`) to eliminate developer hardware skew.
 
 ---
 
 ## Installation
 
-Install globally via `npm`:
+Install globally for quick CLI use:
 
 ```bash
 npm install -g vitix
 ```
 
-Or install locally in your project as a devDependency:
+Or add as a project dependency:
 
 ```bash
 npm install --save-dev vitix
@@ -41,22 +42,22 @@ npm install --save-dev vitix
 
 ## Quick Start
 
-### 1. Initialize Configuration
+### 1. Initialize Config
 Generate a default `vitix.config.ts` configuration file:
 
 ```bash
 vitix init
 ```
 
-### 2. Discovered Routes Check
-Verify that Vitix discovers your route structure correctly:
+### 2. Verify Routes
+Test your route scanner configuration to see what paths will be audited:
 
 ```bash
 vitix routes
 ```
 
-### 3. Run Performance Audits
-Compile the production build, launch the server, and audit pages:
+### 3. Execute Audits
+Build your production assets, start a local server, and run Lighthouse checks:
 
 ```bash
 vitix audit
@@ -67,52 +68,69 @@ vitix audit
 ## CLI Command Reference
 
 ### `vitix init`
-Creates a commented `vitix.config.ts` configuration file.
+Initializes a fully annotated `vitix.config.ts` file in the current directory.
 
-### `vitix routes [options]`
-Lists discovered routes in terminal or raw JSON formats.
-- `-c, --config <file>`: Specify custom configuration file.
-- `--json`: Output routes list as a JSON array.
-
-### `vitix audit [options]`
-Runs production build, starts server, runs Lighthouse audits, and exports reports.
-- `-c, --config <file>`: Custom configuration file path.
-- `-r, --route <path>`: Audit only a single route (e.g. `/about`).
-- `--dev`: Skip build phase (expects the server to be already running on port 3000).
-- `--ci`: CI mode (suppresses progress spinners and progress bars).
-- `--baseline`: Copy current summary report to the baseline folder.
-- `--mobile`: Force mobile preset.
-- `--desktop`: Force desktop preset.
-- `--verbose`: Print detailed logs for debugging.
-
-### `vitix check [options]`
-Asserts performance thresholds against a pre-existing summary JSON report without re-executing audits.
+### `vitix routes`
+Scans and displays all detected page routes.
 - `-c, --config <file>`: Custom configuration path.
-- `-s, --summary <file>`: Path to the target `summary.json` file.
+- `--json`: Output as a raw JSON array.
+
+### `vitix audit`
+Compiles, runs local servers, and executes Lighthouse audits.
+- `-c, --config <file>`: Custom configuration path.
+- `-r, --route <path>`: Focus audit on a single route (e.g. `/blog`).
+- `--dev`: Dev mode (skips build, audits against an active server at port 3000).
+- `--ci`: CI mode (disables spinners and progress bars).
+- `--baseline`: Saves the results of this audit as the new historical baseline.
+- `--mobile` / `--desktop`: Force mobile or desktop presets.
+- `--url <address>`: Audits a live deployed URL directly, skipping build and server launch.
+- `--docker`: Executes the audit inside a Docker container (requires Docker installed).
+- `-o, --open`: Opens the HTML dashboard in a browser after completing the audit.
+- `--verbose`: Prints verbose logs.
+
+### `vitix workspace`
+Finds child projects in monorepos, audits them in parallel, and compiles a centralized index.
+- `--concurrency <number>`: Number of packages to audit in parallel (default: `2`).
+- `--runs <number>`: Override runs per route.
+- `--ci` / `--verbose`: Propagate run styles.
+
+### `vitix serve`
+Spins up a local server to explore historical reports and performance graphs.
+- `-p, --port <number>`: Override port (default: `4000`).
+- `--host <string>`: Server host binding.
+- `--ci`: Run without auto-opening the browser.
+
+### `vitix doctor`
+Runs static analysis on files catching layout shift, missing font preconnect tags, or unoptimized image sources.
+
+### `vitix watch`
+Monitors local file changes and triggers instant dev audits for targeted routes.
+
+### `vitix check`
+Validates threshold rules against a pre-existing `summary.json` run output.
+- `-s, --summary <file>`: Path to the target summary output.
 
 ---
 
-## Configuration API Reference
-
-A sample `vitix.config.ts`:
+## Configuration API (`vitix.config.ts`)
 
 ```typescript
 import { VitixConfig } from 'vitix';
 
 const config: VitixConfig = {
-  // Routes to audit. 'auto' performs automatic discovery.
+  // Routes to audit. 'auto' discovers pages. Or pass a string array: ['/', '/about']
   routes: 'auto',
 
-  // Parameters to interpolate dynamic pages
+  // Parameters to interpolate dynamic path placeholders
   dynamicRouteParams: {
-    '/blog/[slug]': ['first-post', 'modern-web-vitals'],
+    '/blog/[slug]': ['hello-world', 'performance-audit-guide'],
     '/shop/[category]/[id]': [
       { category: 'shoes', id: '10' },
       { category: 'shirts', id: '20' }
     ]
   },
 
-  // Thresholds to assert. Failures throw exit code 1.
+  // Threshold bounds. Failures exit CLI with status 1
   thresholds: {
     categories: {
       performance: 90,
@@ -124,34 +142,65 @@ const config: VitixConfig = {
       LCP: { max: 2500 }, // Largest Contentful Paint (ms)
       CLS: { max: 0.1 },  // Cumulative Layout Shift
       TBT: { max: 300 }   // Total Blocking Time (ms)
+    },
+    budgets: {
+      maxTotalJsSizeKb: 500,
+      maxTotalCssSizeKb: 100,
+      maxTotalImageSizeKb: 1000,
+      maxThirdPartyRequests: 5
     }
   },
 
-  // Runner options
+  // Executing options
   options: {
     numberOfRuns: 3,
     preset: 'mobile', // 'mobile' | 'desktop' | 'both'
     concurrency: 1,
-    timeoutMs: 60000
+    timeoutMs: 60000,
+    setupScript: './tests/auth-setup.js' // Inject authentication cookies/tokens
   },
 
-  // Build commands
+  // Build & Server configuration
   build: {
     command: 'npm run build',
     dir: '.next'
   },
-
-  // Server commands
   server: {
     command: 'npm run start',
     port: 3000
   },
 
-  // Outputs
+  // Outputs & History
   output: {
     dir: '.vitix',
-    formats: ['html', 'json', 'junit'],
-    openReport: false
+    formats: ['html', 'json', 'csv', 'junit']
+  },
+  baseline: {
+    enabled: true,
+    dir: '.vitix/baseline'
+  },
+
+  // CI limits & metric regression checks
+  ci: {
+    strict: true,
+    junit: true,
+    maxPerformanceRegressionPercent: 5,
+    maxMetricRegressionPercent: {
+      LCP: 10,
+      CLS: 15
+    }
+  },
+
+  // Slack/Discord ChatOps
+  notifications: {
+    webhookUrl: 'https://hooks.slack.com/services/T0000/B0000/XXXX',
+    onFailureOnly: true
+  },
+
+  // Real-User Metrics (Google CrUX API)
+  rum: {
+    cruxApiKey: 'GOOGLE_DEVELOPER_API_KEY',
+    origin: 'https://mywebsite.com' // Origin for matching field data
   }
 };
 
@@ -160,12 +209,12 @@ export default config;
 
 ---
 
-## GitHub Actions CI Integration
+## CI/CD Pull Request Integration (GitHub Actions)
 
-You can integrate Vitix in your GitHub Actions workflow using the pre-packaged Dockerfile or local npm installations. Here is a sample workflow using local installation:
+Create a workflow file `.github/workflows/performance-audit.yml`:
 
 ```yaml
-name: Performance Audits
+name: Performance Guard
 
 on:
   push:
@@ -174,79 +223,88 @@ on:
     branches: [ main ]
 
 jobs:
-  performance-audit:
+  audit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright Browsers (Chrome)
+      - name: Install Playwright (Chrome)
         run: npx playwright install chromium
 
       - name: Run Vitix Audits
         run: npx vitix audit --ci --baseline
+        env:
+          GOOGLE_CRUX_API_KEY: ${{ secrets.GOOGLE_CRUX_API_KEY }}
 
-      - name: Upload Audit Dashboard
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Comment PR with Results
+        if: github.event_name == 'pull_request' && always()
+        uses: mshick/add-pr-comment@v2
         with:
-          name: vitix-report
-          path: .vitix/
+          message-path: .vitix/latest/pr_comment.md
 ```
 
 ---
 
-## Docker Support
+## Sandbox Containerized Audits (Docker)
 
-Run Vitix audits in Docker using our official image:
+To isolate audits from local CPU throttle differences and run them on a consistent hardware baseline, build the Dockerfile and pass `--docker`:
 
 ```bash
-# Build the Docker image
+# Build local docker image
 docker build -t vitix .
 
-# Run audits on a mounted directory
-docker run --rm -v $(pwd):/usr/src/app vitix audit --ci
+# Execute audit inside container
+vitix audit --docker
 ```
 
 ---
 
-## Development & Contribution
+## Contributing
 
-We use `vitest` for tests and `esbuild` for bundling.
+We welcome community contributions! Please read our guidelines to get started.
 
-1. Clone and install dependencies:
+### Development Setup
+
+1. **Clone repository**:
    ```bash
-   git clone https://github.com/abhaykumar/vitix.git
-   cd vitix
+   git clone git@github.com:abhaykumar1415/Vitix.git
+   cd Vitix
    npm install
    ```
 
-2. Run unit tests:
+2. **Verify tests**:
+   Make sure all 52 unit tests pass:
    ```bash
    npm run test
    ```
 
-3. Run in development:
-   ```bash
-   npm run dev -- --help
-   ```
-
-4. Build production code:
+3. **Build TypeScript compiler**:
    ```bash
    npm run build
    ```
+
+4. **Link CLI locally**:
+   ```bash
+   npm link
+   ```
+
+### Contribution Rules
+- Always preserve code docstrings and comments.
+- Ensure type checks pass by running `npm run build` locally before submitting.
+- Add corresponding unit tests inside `tests/` for any new utility, runner option, or CLI command.
 
 ---
 
 ## License
 
-MIT © [Abhay Kumar](https://github.com/abhaykumar)
+MIT © [Abhay Kumar](https://github.com/abhaykumar1415)

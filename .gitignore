@@ -1,7 +1,47 @@
-node_modules
-dist
-.vitix
-.next
-temp-workspace-test
+# Dependencies
+node_modules/
+/jspm_packages/
+
+# Build & Compilation Outputs
+dist/
+/build/
+/out/
+/.next/
+/.docusaurus/
+/.nuxt/
+/.svelte-kit/
+/.astro/
+
+# Local Vitix Reports, Baseline and Cache directories
+.vitix/
+.vitix-cache/
+temp-workspace-test/
+
+# Debug and System Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 *.log
+
+# Operating System Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Text Editors Configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.project
+.classpath
+.settings/
