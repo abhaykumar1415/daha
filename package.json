@@ -13,7 +13,8 @@
     }
   },
   "bin": {
-    "daha": "dist/bin.js"
+    "daha": "dist/bin.js",
+    "daha-cli": "dist/bin.js"
   },
   "files": [
     "dist"

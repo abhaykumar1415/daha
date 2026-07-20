@@ -2,134 +2,200 @@
 
 [![npm version](https://img.shields.io/npm/v/daha-cli.svg?style=flat-square)](https://www.npmjs.com/package/daha-cli)
 [![node version](https://img.shields.io/badge/node-%3E%3D20.0.0-blue?style=flat-square)](https://nodejs.org)
-[![license](https://img.shields.io/npm/l/daha.svg?style=flat-square)](https://github.com/abhaykumar/daha/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/daha-cli.svg?style=flat-square)](https://github.com/abhaykumar1415/daha/blob/main/LICENSE)
 
 > **Performance as Code for Modern Web Applications (Next.js, Remix, Astro, SvelteKit)**
 
-**Daha** is an enterprise-ready performance engineering CLI tool that automates Lighthouse audits, tracks Core Web Vitals, and monitors regressions across web applications and monorepos. 
+**Daha** (`daha-cli` on npm) is a performance engineering CLI that automates Lighthouse audits, tracks Core Web Vitals, and monitors regressions across web apps and monorepos.
 
-It discovers routes automatically, runs isolated Lighthouse audits via Playwright, compares results against historical baselines, fetches real-user metrics (RUM) via the Chrome UX Report (CrUX) API, and notifies developers through Slack/Discord webhook alerts.
+It discovers routes automatically, runs Lighthouse via Playwright, compares results against baselines, optionally overlays Chrome UX Report (CrUX) field data, and can notify Slack/Discord on failure.
 
 ---
 
 ## Key Features
 
-- ⚡ **Cross-Framework Route Discovery**: Auto-scans directory files and manifests to map static and dynamic pages for **Next.js** (App and Pages routers), **Remix** (including flat routing), **Astro**, and **SvelteKit**.
-- 🛠️ **Programmatic Worker Pool**: Runs multiple audits per route concurrently to calculate a stable median metric, avoiding variance issues. Supports authentication and cookies injection using Playwright.
-- 📈 **PR Regression Guard**: Intercepts pull requests, compares audits to baseline files, and fails CI pipelines if performance drops beyond customizable margins.
-- 🌐 **Real-User Metrics (RUM)**: Queries Google's Chrome UX Report (CrUX) API to overlay real-user field experiences side-by-side with synthetic lab audits.
-- 💬 **ChatOps Webhook Alerts**: Formats and dispatches detailed test outcomes directly to developer channels on **Slack** (Block Kit format) or **Discord** (Embed formatting) on failure.
-- 📦 **Monorepo Workspaces**: Scans root projects (Yarn, NPM, PNPM workspaces), runs concurrent package audits in isolation, and outputs a unified central workspace dashboard.
-- 🐳 **Consistent Sandboxed Audits**: Launches single-command audits inside a Docker container (`--docker`) to eliminate developer hardware skew.
+- **Cross-framework route discovery** for Next.js (App + Pages), Remix, Astro, and SvelteKit
+- **Stable audits** with multiple runs per route and median scoring
+- **PR regression guard** with baseline comparison and CI-friendly exit codes
+- **Real-user metrics (RUM)** via the CrUX API
+- **ChatOps alerts** for Slack and Discord webhooks
+- **Monorepo workspace** audits with a unified dashboard
+- **Docker mode** (`--docker`) for consistent hardware baselines
+- **One-command browser setup** (`daha setup`) with first-run auto-install
+
+---
+
+## Requirements
+
+- Node.js `>= 20`
+- A supported web app (Next.js, Remix, Astro, or SvelteKit)
 
 ---
 
 ## Installation
 
-Install globally for quick CLI use:
-
 ```bash
+# project dependency (recommended)
+npm install --save-dev daha-cli
+
+# or globally
 npm install -g daha-cli
 ```
 
-Or add as a project dependency:
+The package exposes both binaries: `daha` and `daha-cli` (same CLI).
+
+---
+
+## Getting help
 
 ```bash
-npm install --save-dev daha-cli
+daha --help
+daha -h
+daha-cli --help
+
+daha help init
+daha init --help
+daha audit --help
 ```
-
-Then install the Playwright Chromium browser (required for Lighthouse audits):
-
-```bash
-npx daha setup
-```
-
-Audits also auto-install Chromium on first run if it is missing.
 
 ---
 
 ## Quick Start
 
-### 1. Initialize Config
-Generate a default `daha.config.ts` configuration file:
+From your app root:
 
 ```bash
-daha init
+# 1) Scaffold config + .gitignore (+ optional tsconfig exclude)
+npx daha init -y
+
+# 2) Install Playwright Chromium (also auto-runs on first audit if missing)
+npx daha setup
+
+# 3) List discovered routes
+npx daha routes
+
+# 4) Run a production audit
+npx daha audit
 ```
 
-### 2. Install Browser
-Download Playwright Chromium used by Lighthouse:
+Useful variants:
 
 ```bash
-daha setup
-```
+# Audit a single route against a running dev server on :3000
+npx daha audit --dev -r /
 
-### 3. Verify Routes
-Test your route scanner configuration to see what paths will be audited:
+# Faster local iteration
+npx daha audit --runs 1 -r /
 
-```bash
-daha routes
-```
-
-### 4. Execute Audits
-Build your production assets, start a local server, and run Lighthouse checks:
-
-```bash
-daha audit
+# CI mode + save baseline
+npx daha audit --ci --baseline
 ```
 
 ---
 
 ## CLI Command Reference
 
+### Global
+
+| Command | Description |
+|---------|-------------|
+| `daha --help` | Show all commands and examples |
+| `daha --version` | Print package version |
+| `daha help <command>` | Show help for one command |
+
 ### `daha init`
-Initializes a fully annotated `daha.config.ts` file in the current directory.
+
+Creates `daha.config.ts` and project scaffolding:
+
+- Appends `.daha/` to `.gitignore` (creates the file if missing)
+- Optionally excludes `daha.config.ts` from `tsconfig.json`
+- Prints a next-steps checklist
+
+| Option | Description |
+|--------|-------------|
+| `-y, --yes` | Skip prompts; apply recommended defaults |
+| `--exclude-tsconfig` | Always update `tsconfig.json` |
+| `--no-exclude-tsconfig` | Never modify `tsconfig.json` |
 
 ### `daha setup`
-Installs the Playwright Chromium browser required for Lighthouse audits.
-- `--force`: Reinstall Chromium even if it is already present.
 
-Audits call this automatically on first run when Chromium is missing.
+Installs Playwright Chromium used by Lighthouse.
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Reinstall even if Chromium is already present |
+
+Audits also auto-install Chromium on first run when it is missing.
 
 ### `daha routes`
-Scans and displays all detected page routes.
-- `-c, --config <file>`: Custom configuration path.
-- `--json`: Output as a raw JSON array.
+
+Lists discovered page routes.
+
+| Option | Description |
+|--------|-------------|
+| `-c, --config <file>` | Custom config path |
+| `--json` | Print routes as a JSON array |
 
 ### `daha audit`
-Compiles, runs local servers, and executes Lighthouse audits.
-- `-c, --config <file>`: Custom configuration path.
-- `-r, --route <path>`: Focus audit on a single route (e.g. `/blog`).
-- `--dev`: Dev mode (skips build, audits against an active server at port 3000).
-- `--ci`: CI mode (disables spinners and progress bars).
-- `--baseline`: Saves the results of this audit as the new historical baseline.
-- `--mobile` / `--desktop`: Force mobile or desktop presets.
-- `--url <address>`: Audits a live deployed URL directly, skipping build and server launch.
-- `--docker`: Executes the audit inside a Docker container (requires Docker installed).
-- `-o, --open`: Opens the HTML dashboard in a browser after completing the audit.
-- `--verbose`: Prints verbose logs.
+
+Builds (unless skipped), starts the app server, and runs Lighthouse.
+
+| Option | Description |
+|--------|-------------|
+| `-c, --config <file>` | Custom config path |
+| `-r, --route <path>` | Audit only this route (e.g. `/blog`) |
+| `--dev` | Skip build; expect server on port 3000 |
+| `--ci` | Minimal CI-friendly output |
+| `--baseline` | Save this run as the new baseline |
+| `--mobile` / `--desktop` | Force preset |
+| `--url <address>` | Audit a live URL (skip local build/server) |
+| `--docker` | Run inside the Daha Docker image |
+| `-o, --open` | Open the HTML report when done |
+| `--verbose` | Verbose logs |
+| `--runs <n>` | Override runs per route |
+| `--concurrency <n>` | Override parallel route audits |
+| `--timeout <ms>` | Override per-route timeout |
 
 ### `daha workspace`
-Finds child projects in monorepos, audits them in parallel, and compiles a centralized index.
-- `--concurrency <number>`: Number of packages to audit in parallel (default: `2`).
-- `--runs <number>`: Override runs per route.
-- `--ci` / `--verbose`: Propagate run styles.
+
+Audits monorepo packages in parallel and writes a workspace index.
+
+| Option | Description |
+|--------|-------------|
+| `--concurrency <n>` | Packages in parallel (default `2`) |
+| `--runs <n>` | Override runs per route |
+| `--ci` / `--verbose` | Propagate run styles |
 
 ### `daha serve`
-Spins up a local server to explore historical reports and performance graphs.
-- `-p, --port <number>`: Override port (default: `4000`).
-- `--host <string>`: Server host binding.
-- `--ci`: Run without auto-opening the browser.
+
+Serves historical audit reports locally.
+
+| Option | Description |
+|--------|-------------|
+| `-p, --port <number>` | Port (default `4000`) |
+| `--host <string>` | Host binding |
+| `--ci` | Do not auto-open the browser |
 
 ### `daha doctor`
-Runs static analysis on files catching layout shift, missing font preconnect tags, or unoptimized image sources.
+
+Static checks for common performance issues (images, fonts, outdated frameworks, etc.).
 
 ### `daha watch`
-Monitors local file changes and triggers instant dev audits for targeted routes.
+
+Watches source files and re-runs targeted dev audits on change.
 
 ### `daha check`
-Validates threshold rules against a pre-existing `summary.json` run output.
-- `-s, --summary <file>`: Path to the target summary output.
+
+Validates thresholds against an existing `summary.json`.
+
+| Option | Description |
+|--------|-------------|
+| `-s, --summary <file>` | Path to summary JSON |
+| `-c, --config <file>` | Custom config path |
+
+### `daha init-hooks`
+
+Installs a git pre-commit hook that runs performance checks.
 
 ---
 
@@ -228,11 +294,13 @@ const config: DahaConfig = {
 export default config;
 ```
 
+Add `.daha/` to `.gitignore` (done automatically by `daha init`).
+
 ---
 
 ## CI/CD Pull Request Integration (GitHub Actions)
 
-Create a workflow file `.github/workflows/performance-audit.yml`:
+Create `.github/workflows/performance-audit.yml`:
 
 ```yaml
 name: Performance Guard
@@ -278,8 +346,6 @@ jobs:
 
 ## Sandbox Containerized Audits (Docker)
 
-To isolate audits from local CPU throttle differences and run them on a consistent hardware baseline, build the Dockerfile and pass `--docker`:
-
 ```bash
 # Build local docker image
 docker build -t daha .
@@ -292,37 +358,35 @@ daha audit --docker
 
 ## Contributing
 
-We welcome community contributions! Please read our guidelines to get started.
-
 ### Development Setup
 
-1. **Clone repository**:
+1. Clone and install:
    ```bash
    git clone git@github.com:abhaykumar1415/daha.git
    cd daha
    npm install
    ```
 
-2. **Verify tests**:
-   Make sure all 52 unit tests pass:
+2. Run tests:
    ```bash
-   npm run test
+   npm test
    ```
 
-3. **Build TypeScript compiler**:
+3. Build:
    ```bash
    npm run build
    ```
 
-4. **Link CLI locally**:
+4. Link locally (optional):
    ```bash
    npm link
    ```
 
 ### Contribution Rules
-- Always preserve code docstrings and comments.
-- Ensure type checks pass by running `npm run build` locally before submitting.
-- Add corresponding unit tests inside `tests/` for any new utility, runner option, or CLI command.
+
+- Preserve existing comments and docstrings.
+- Run `npm run build` and `npm test` before submitting.
+- Add unit tests under `tests/` for new utilities, options, or commands.
 
 ---
 

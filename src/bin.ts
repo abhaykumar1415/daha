@@ -44,14 +44,36 @@ const program = new Command();
 program
   .name('daha')
   .description('Performance as Code for Next.js - Core Web Vitals and Lighthouse Audits CLI')
-  .version(getVersion());
+  .version(getVersion())
+  .addHelpText(
+    'after',
+    `
+Examples:
+  $ daha --help
+  $ daha init -y
+  $ daha setup
+  $ daha routes
+  $ daha audit
+  $ daha audit --dev -r /
+  $ daha audit --ci --baseline
+
+Run "daha help <command>" for details on a specific command.
+`
+  );
 
 // 1. init command
 program
   .command('init')
-  .description('Initialize a default daha.config.ts file in the current directory')
-  .action(async () => {
-    await handleInitCommand();
+  .description('Initialize daha.config.ts and project scaffolding (.gitignore, optional tsconfig)')
+  .option('-y, --yes', 'Skip prompts and apply recommended defaults')
+  .option('--exclude-tsconfig', 'Exclude daha.config.ts from tsconfig.json')
+  .option('--no-exclude-tsconfig', 'Do not modify tsconfig.json')
+  .action(async (options) => {
+    await handleInitCommand({
+      yes: !!options.yes,
+      excludeTsconfig: !!options.excludeTsconfig,
+      noExcludeTsconfig: !!options.noExcludeTsconfig,
+    });
   });
 
 // 1a. setup command
