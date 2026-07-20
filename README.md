@@ -38,6 +38,14 @@ Or add as a project dependency:
 npm install --save-dev daha-cli
 ```
 
+Then install the Playwright Chromium browser (required for Lighthouse audits):
+
+```bash
+npx daha setup
+```
+
+Audits also auto-install Chromium on first run if it is missing.
+
 ---
 
 ## Quick Start
@@ -49,14 +57,21 @@ Generate a default `daha.config.ts` configuration file:
 daha init
 ```
 
-### 2. Verify Routes
+### 2. Install Browser
+Download Playwright Chromium used by Lighthouse:
+
+```bash
+daha setup
+```
+
+### 3. Verify Routes
 Test your route scanner configuration to see what paths will be audited:
 
 ```bash
 daha routes
 ```
 
-### 3. Execute Audits
+### 4. Execute Audits
 Build your production assets, start a local server, and run Lighthouse checks:
 
 ```bash
@@ -69,6 +84,12 @@ daha audit
 
 ### `daha init`
 Initializes a fully annotated `daha.config.ts` file in the current directory.
+
+### `daha setup`
+Installs the Playwright Chromium browser required for Lighthouse audits.
+- `--force`: Reinstall Chromium even if it is already present.
+
+Audits call this automatically on first run when Chromium is missing.
 
 ### `daha routes`
 Scans and displays all detected page routes.
@@ -238,8 +259,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright (Chrome)
-        run: npx playwright install chromium
+      - name: Install Playwright Chromium
+        run: npx daha setup
 
       - name: Run Daha Audits
         run: npx daha audit --ci --baseline

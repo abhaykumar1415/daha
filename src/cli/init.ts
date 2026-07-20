@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 
-const DEFAULT_CONFIG_TEMPLATE = `import { DahaConfig } from 'daha';
+const DEFAULT_CONFIG_TEMPLATE = `import { DahaConfig } from 'daha-cli';
 
 const config: DahaConfig = {
   // Routes to audit. 'auto' discovers all App and Pages router paths automatically.

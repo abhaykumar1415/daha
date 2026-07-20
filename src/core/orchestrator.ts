@@ -18,6 +18,7 @@ import {
 } from '../reporter/index.js';
 import { DahaError } from '../utils/errors.js';
 import { dispatchWebhook } from '../utils/notifications.js';
+import { ensureChromiumReady } from '../utils/browsers.js';
 
 export interface AuditRunOptions {
   config: ParsedDahaConfig;
@@ -58,6 +59,9 @@ export async function runAudit(options: AuditRunOptions): Promise<DahaRunSummary
   });
 
   try {
+    // 0. Ensure Playwright Chromium is available (auto-install on first run)
+    await ensureChromiumReady({ autoInstall: true });
+
     // 1. Production Build Phase (Skip in devMode or if server.url is custom)
     if (!devMode && !config.server?.url) {
       if (!ciMode) spinner.start('Compiling Next.js production build...');

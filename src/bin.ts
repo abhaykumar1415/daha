@@ -11,6 +11,7 @@ import { handleDoctorCommand } from './cli/doctor.js';
 import { handleWatchCommand } from './cli/watch.js';
 import { handleInitHooksCommand } from './cli/hooks.js';
 import { handleWorkspaceCommand } from './cli/workspace.js';
+import { handleSetupCommand } from './cli/setup.js';
 import { runAudit } from './core/orchestrator.js';
 import { loadConfig } from './config/loader.js';
 
@@ -51,6 +52,15 @@ program
   .description('Initialize a default daha.config.ts file in the current directory')
   .action(async () => {
     await handleInitCommand();
+  });
+
+// 1a. setup command
+program
+  .command('setup')
+  .description('Install Playwright Chromium required for Lighthouse audits')
+  .option('--force', 'Reinstall Chromium even if it is already present')
+  .action(async (options) => {
+    await handleSetupCommand({ force: !!options.force });
   });
 
 // 2. routes command
